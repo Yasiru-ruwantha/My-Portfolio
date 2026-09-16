@@ -42,6 +42,9 @@ const Education = () => {
         <p className="text-sm text-navy-300 mt-1">
           University of Moratuwa, Sri Lanka
         </p>
+        <p className="text-sm text-navy-300 mt-1">
+          CGPA: 3.44
+        </p>
       </motion.div>
     </div>
   );
