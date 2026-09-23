@@ -3,45 +3,38 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
-// Get a free access key at https://web3forms.com (just enter your email,
-// no account needed) and put it in .env.local as:
-//   NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY=your-key-here
-// Web3Forms is designed to be called straight from the browser like this —
-// the key is public-safe, submissions are rate-limited per domain.
-const WEB3FORMS_ACCESS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY;
-
 const Contact = () => {
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!WEB3FORMS_ACCESS_KEY) {
-      setStatus("not-configured");
-      return;
-    }
-
     const form = e.target;
-    const data = new FormData(form);
-    data.append("access_key", WEB3FORMS_ACCESS_KEY);
-    data.append("subject", `Portfolio contact from ${data.get("name")}`);
+    const name = form.name.value;
+    const email = form.email.value;
+    const message = form.message.value;
 
     setStatus("sending");
+    setErrorMessage("");
+
     try {
-      const res = await fetch("https://api.web3forms.com/submit", {
+      const res = await fetch("/api/contact", {
         method: "POST",
-        headers: { Accept: "application/json" },
-        body: data,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, message }),
       });
       const result = await res.json();
-      if (result.success) {
+      if (res.ok && result.success) {
         setStatus("sent");
         form.reset();
       } else {
         setStatus("error");
+        setErrorMessage(result.error || "Something went wrong sending your message. Please try again.");
       }
     } catch {
       setStatus("error");
+      setErrorMessage("Something went wrong sending your message. Please try again.");
     }
   };
 
@@ -74,9 +67,6 @@ const Contact = () => {
         onSubmit={handleSubmit}
         className="max-w-xl mx-auto flex flex-col gap-4"
       >
-        {/* honeypot — bots fill this in, real visitors never see it */}
-        <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} autoComplete="off" />
-
         <input
           name="name"
           type="text"
@@ -113,12 +103,7 @@ const Contact = () => {
         )}
         {status === "error" && (
           <p className="text-center text-sm text-red-400">
-            Something went wrong sending your message. Please try again.
-          </p>
-        )}
-        {status === "not-configured" && (
-          <p className="text-center text-sm text-red-400">
-            The contact form isn&apos;t set up yet — missing a Web3Forms access key.
+            {errorMessage}
           </p>
         )}
       </motion.form>
