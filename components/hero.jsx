@@ -54,8 +54,7 @@ const Hero = () => {
       <motion.div variants={item} className="flex flex-col sm:flex-row items-center gap-4 mt-4">
         <a
           href="#contact"
-          className="px-10 py-3 border border-blue-500 rounded-full bg-blue-500 hover:bg-blue-400
-          text-white flex items-center gap-2 transition-transform hover:scale-105"
+          className="px-10 py-3 border rounded-full border-navy-400 text-navy-50 flex items-center gap-2 transition-transform hover:scale-105"
         >
           Contact me
           <Image
